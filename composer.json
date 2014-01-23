@@ -1,0 +1,16 @@
+{
+  "name": "noodlehaus/pico",
+  "description": "provides fast and simple routing for your apps",
+  "authors": [
+    { "name": "Jesus A. Domingo", "email": "jesus.domingo@gmail.com" }
+  ],
+  "require": {
+    "php": ">= 5.4.0",
+    "ext-apc": "*"
+  },
+  "autoload": {
+    "files": [
+      "pico.php"
+    ]
+  }
+}
