@@ -1,12 +1,16 @@
 {
   "name": "noodlehaus/pico",
-  "description": "provides fast and simple routing for your apps",
+  "description": "fast and simple routing for your apps",
   "authors": [
     { "name": "Jesus A. Domingo", "email": "jesus.domingo@gmail.com" }
   ],
   "require": {
     "php": ">= 5.4.0",
     "ext-apc": "*"
+  },
+  "suggest": {
+    "noodlehaus/var-utils": "helpers for accessing variables",
+    "noodlehaus/phtml": "helpers for using phtml view files"
   },
   "autoload": {
     "files": [
