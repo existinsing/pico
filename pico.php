@@ -85,6 +85,19 @@ function middleware($uri, $cb_or_tokens = null) {
     array_keys($cb_or_tokens)
   );
 
+  // run generic hooks
+  foreach ($regex_cb['.*'] as $cb)
+    call_user_func($cb, $uri);
+  unset($regex_cb['.*']);
+
+  // run regex hooks
+  foreach ($regex_cb as $regex => $cb_list) {
+    if (preg_match("@{$regex}@", $uri)) {
+      foreach ($cb_list as $cb)
+        call_user_func($cb, $uri);
+    }
+  }
+
   // run hooks for matching symbols
   if ($matches) {
     foreach ($matches as $match) {
@@ -97,13 +110,6 @@ function middleware($uri, $cb_or_tokens = null) {
     }
   }
 
-  // run regex hooks
-  foreach ($regex_cb as $regex => $cb_list) {
-    if (preg_match("@{$regex}@", $uri)) {
-      foreach ($cb_list as $cb)
-        call_user_func($cb, $uri);
-    }
-  }
 }
 
 /**
