@@ -61,12 +61,13 @@ function redirect($location, $code = 302) {
  */
 function middleware($uri, $cb_or_tokens = null) {
 
-  static $regex_cb = array('.*' => array()),
+  static $gener_cb = array(),
+         $regex_cb = array(),
          $param_cb = array();
 
   // a catch-all mapping call
   if (is_callable($uri)) {
-    $regex_cb['.*'][] = $uri;
+    $gener_cb[] = $uri;
     return;
   }
 
@@ -79,16 +80,9 @@ function middleware($uri, $cb_or_tokens = null) {
     return;
   }
 
-  // get symbols that have hooks
-  $matches = array_intersect(
-    array_keys($param_cb),
-    array_keys($cb_or_tokens)
-  );
-
   // run generic hooks
-  foreach ($regex_cb['.*'] as $cb)
+  foreach ($gener_cb as $cb)
     call_user_func($cb, $uri);
-  unset($regex_cb['.*']);
 
   // run regex hooks
   foreach ($regex_cb as $regex => $cb_list) {
@@ -97,6 +91,12 @@ function middleware($uri, $cb_or_tokens = null) {
         call_user_func($cb, $uri);
     }
   }
+
+  // get symbols that have hooks
+  $matches = array_intersect(
+    array_keys($param_cb),
+    array_keys($cb_or_tokens)
+  );
 
   // run hooks for matching symbols
   if ($matches) {
