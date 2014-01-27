@@ -37,7 +37,8 @@ route('GET', '/greet/:name', function ($params) {
   echo "<h1>Hello there, {$params['name']}!</h1>";
 });
 
-pico();```
+pico();
+```
 
 function list:
 
