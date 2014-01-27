@@ -58,6 +58,6 @@ function ioc($name, $value = null);
 ```
 
 `pico()` uses the `bind()` function created by
-(Ross Masters)[http://github.com/rmasters] for dispatch.
+[Ross Masters](http://github.com/rmasters) for dispatch.
 
 `pico()` is licensed under the MIT license - <http://noodlehaus.mit-license.org>
