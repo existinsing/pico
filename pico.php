@@ -9,22 +9,19 @@
 /**
  * Simplistic value/DI container
  */
-function context($name, $value = null) {
+function ioc($name, $value = null) {
 
-  static $cache = array();
+  static $container = array();
 
   if ($value == null) {
-
-    if (!isset($cache[$name]))
+    if (!isset($container[$name]))
       return null;
-
-    if (is_callable($cache[$name]))
-      return call_user_func($cache[$name]);
-
-    return $cache[$name];
+    if (is_callable($container[$name]))
+      return call_user_func($container[$name]);
+    return $container[$name];
   }
 
-  $cache[$name] = $value;
+  $container[$name] = $value;
 }
 
 /**
@@ -59,57 +56,49 @@ function redirect($location, $code = 302) {
 /**
  * Route symbol, regex, or generic filters
  */
-function middleware($uri, $cb_or_tokens = null) {
+function middleware($callback = null) {
 
-  static $gener_cb = array(),
-         $regex_cb = array(),
-         $param_cb = array();
+  static $stack = array();
 
-  // a catch-all mapping call
-  if (is_callable($uri)) {
-    $gener_cb[] = $uri;
-    return;
-  }
-
-  // this is a mapping call
-  if (is_callable($cb_or_tokens)) {
-    if ($uri[0] == ':')
-      $param_cb[substr($uri, 1)][] = $cb_or_tokens;
-    else
-      $regex_cb[$uri][] = $cb_or_tokens;
+  // mapping call
+  if (is_callable($callback)) {
+    $stack[] = $callback;
     return;
   }
 
   // run generic hooks
-  foreach ($gener_cb as $cb)
-    call_user_func($cb, $uri);
+  foreach ($stack as $cb)
+    call_user_func($cb);
+}
 
-  // run regex hooks
-  foreach ($regex_cb as $regex => $cb_list) {
-    if (preg_match("@{$regex}@", $uri)) {
-      foreach ($cb_list as $cb)
-        call_user_func($cb, $uri);
-    }
+/**
+ * Bind transform callbacks to route symbol values
+ */
+function bind($symbol, $callback = null) {
+
+  // callback store and symbol cache
+  static $bindings = array();
+  static $symcache = array();
+
+  // bind callback to symbol
+  if (is_callable($callback)) {
+    $bindings[$symbol] = $callback;
+    return;
   }
 
-  // get symbols that have hooks
-  $matches = array_intersect(
-    array_keys($param_cb),
-    array_keys($cb_or_tokens)
-  );
+  // string symbol, look it up
+  if (!is_array($symbol))
+    return isset($symcache[$symbol]) ? $symcache[$symbol] : null;
 
-  // run hooks for matching symbols
-  if ($matches) {
-    foreach ($matches as $match) {
-      foreach ($param_cb[$match] as $func) {
-        call_user_func(
-          $func,
-          $cb_or_tokens[$match]
-        );
-      }
-    }
+  // called with hash, exec (internal API)
+  $values = array();
+  foreach ($symbol as $sym => $val) {
+    if (isset($bindings[$sym]))
+      $symcache[$sym] = $val = call_user_func($bindings[$sym], $val);
+    $values[$sym] = $val;
   }
 
+  return $values;
 }
 
 /**
@@ -125,12 +114,7 @@ function route($methods, $pattern, $callback) {
 
   $methods = array_map('strtoupper', (array) $methods);
   $pattern = '/'.trim($pattern, '/');
-  $regexpr = apc_fetch("regexpr:{$pattern}");
-
-  if (!$regexpr) {
-    $regexpr = '@^'.preg_replace('@:(\w+)@', '(?<\1>[^/]+)', $pattern).'$@';
-    apc_store("regexpr:{$pattern}", $regexpr);
-  }
+  $regexpr = '@^'.preg_replace('@:(\w+)@', '(?<\1>[^/]+)', $pattern).'$@';
 
   foreach ($methods as $method)
     $routes[$method][$regexpr] = $callback;
@@ -154,17 +138,10 @@ function pico() {
   $routes = route(null, null, null);
   $callback = null;
 
-  $regexpr = apc_fetch("invoke:{$method}:{$uri}");
-  if ($regexpr) {
-    $callback = $routes[$method][$regexpr];
-    preg_match($regexpr, $uri, $params);
-  } else {
-    foreach ($routes[$method] as $regexpr => $handler) {
-      if (preg_match($regexpr, $uri, $params)) {
-        apc_store("invoke:{$method}:{$uri}", $regexpr);
-        $callback = $handler;
-        break;
-      }
+  foreach ($routes[$method] as $regexpr => $handler) {
+    if (preg_match($regexpr, $uri, $params)) {
+      $callback = $handler;
+      break;
     }
   }
 
@@ -178,6 +155,6 @@ function pico() {
   ));
 
   middleware($uri, $params);
-  call_user_func($callback, $params);
+  call_user_func($callback, bind($params));
 }
 ?>

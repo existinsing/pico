@@ -5,8 +5,7 @@
     { "name": "Jesus A. Domingo", "email": "jesus.domingo@gmail.com" }
   ],
   "require": {
-    "php": ">= 5.4.0",
-    "ext-apc": "*"
+    "php": ">= 5.4.0"
   },
   "suggest": {
     "noodlehaus/var-utils": "helpers for accessing variables",

@@ -6,46 +6,38 @@
 <?php
 require __DIR__."/pico.php";
 
-// on 404, call function
+middleware(function () {
+  ioc('data', array('id' => 1));
+  ioc('singleton', function () {
+    static $inst = null;
+    if (!$inst)
+      $inst = new stdclass;
+    return $inst;
+  });
+  ioc('renewable', function () {
+    return new stdclass;
+  });
+});
+
+bind('name', function ($name) {
+  return strtoupper($name);
+});
+
 error(404, function () {
-  echo "Page not found!";
+  echo '<p>Page not found!</p>';
 });
 
-// middleware for all requests
-middleware(function ($uri) {
-  $db = connect_to_db();
-  // store something into context()
-  context('db', $db);
-});
-
-// this gets run on /admin/blah URIs
-middleware('^\/admin\/', function ($uri) {
-  // ...
-});
-
-// this gets run for routes that have :name in it
-middleware(':name', function ($name) {
-  context('name', strtoupper($name));
-});
-
-// plain route
 route('GET', '/index', function () {
-  // pull db from context()
-  $db = context('db');
-  echo "hello, there!";
+  echo '<p>Welcome!</p>';
+  $mw1 = ioc('mware-1');
+  $mw2 = ioc('mware-2');
 });
 
-// route with symbol (which has a middleware tied to it)
-route('GET', '/greet/:name', function ($name) {
-  // get value stored by middleware
-  $name = context('name');
-  echo "hello, {$name}!";
+route('GET', '/greet/:name', function ($params) {
+  echo "<h1>Hello there, {$params['name']}!</h1>";
 });
 
-// serve the routes
-pico();
-?>
-```
+pico();```
 
 function list:
 
@@ -54,13 +46,17 @@ function list:
 // routing
 function pico();
 function route($methods = null, $pattern = null, $callback = null);
-function middleware($uri, $cb_or_tokens = null);
+function middleware($callback = null);
+function bind($symbol, $callback);
 function redirect($location, $code = 302);
 function error($code, $callback = null);
 
 // data container
-function context($name, $value = null);
+function ioc($name, $value = null);
 ?>
 ```
+
+`pico()` uses the `bind()` function created by
+(Ross Masters)[http://github.com/rmasters] for dispatch.
 
 `pico()` is licensed under the MIT license - <http://noodlehaus.mit-license.org>

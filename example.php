@@ -1,26 +1,21 @@
 <?php
 require __DIR__."/pico.php";
 
-middleware(function ($uri) {
-  // store a value in context()
-  context('mware-1', array('id' => 1));
-});
-
-middleware(function ($uri) {
-  context('mware-2', function () {
-    // only gets run on access
-    return array('id' => 2);
+middleware(function () {
+  ioc('data', array('id' => 1));
+  ioc('singleton', function () {
+    static $inst = null;
+    if (!$inst)
+      $inst = new stdclass;
+    return $inst;
+  });
+  ioc('renewable', function () {
+    return new stdclass;
   });
 });
 
-middleware('^\/greet\/', function () {
-  // gets run when uri starts with /greet/
-  echo '<p>Getting ready to greet!</p>';
-});
-
-middleware(':name', function ($name) {
-  // gets run when route contains :name
-  echo "<p>Greeting {$name}!</p>";
+bind('name', function ($name) {
+  return strtoupper($name);
 });
 
 error(404, function () {
@@ -29,8 +24,8 @@ error(404, function () {
 
 route('GET', '/index', function () {
   echo '<p>Welcome!</p>';
-  $mw1 = context('mware-1');
-  $mw2 = context('mware-2');
+  $mw1 = ioc('mware-1');
+  $mw2 = ioc('mware-2');
 });
 
 route('GET', '/greet/:name', function ($params) {
