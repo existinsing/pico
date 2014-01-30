@@ -1,6 +1,7 @@
 {
   "name": "noodlehaus/pico",
   "description": "fast and simple routing for your apps",
+  "license": "MIT",
   "authors": [
     { "name": "Jesus A. Domingo", "email": "jesus.domingo@gmail.com" }
   ],
