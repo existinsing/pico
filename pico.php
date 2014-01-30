@@ -7,24 +7,6 @@
  */
 
 /**
- * Simplistic value/DI container
- */
-function ioc($name, $value = null) {
-
-  static $container = array();
-
-  if ($value == null) {
-    if (!isset($container[$name]))
-      return null;
-    if (is_callable($container[$name]))
-      return call_user_func($container[$name]);
-    return $container[$name];
-  }
-
-  $container[$name] = $value;
-}
-
-/**
  * Set an http error handler, or trigger one
  */
 function error($code, $callback = null) {
@@ -114,7 +96,7 @@ function route($methods, $pattern, $callback) {
 
   $methods = array_map('strtoupper', (array) $methods);
   $pattern = '/'.trim($pattern, '/');
-  $regexpr = '@^'.preg_replace('@:(\w+)@', '(?<\1>[^/]+)', $pattern).'$@';
+  $regexpr = '@^'.preg_replace('@\{(\w+)\}@', '(?<\1>[^/]+)', $pattern).'$@';
 
   foreach ($methods as $method)
     $routes[$method][$regexpr] = $callback;

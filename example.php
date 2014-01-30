@@ -1,34 +1,29 @@
 <?php
 require __DIR__."/pico.php";
 
+// gets run for every request
 middleware(function () {
-  ioc('data', array('id' => 1));
-  ioc('singleton', function () {
-    static $inst = null;
-    if (!$inst)
-      $inst = new stdclass;
-    return $inst;
-  });
-  ioc('renewable', function () {
-    return new stdclass;
-  });
+  some_startup_stuff();
 });
 
+// gets run on routes with {name} symbol
 bind('name', function ($name) {
   return strtoupper($name);
 });
 
+// our 404 callback routine
 error(404, function () {
   echo '<p>Page not found!</p>';
 });
 
+// plain route
 route('GET', '/index', function () {
   echo '<p>Welcome!</p>';
-  $mw1 = ioc('mware-1');
-  $mw2 = ioc('mware-2');
 });
 
-route('GET', '/greet/:name', function ($params) {
+// route with symbol
+route('GET', '/greet/{name}', function ($params) {
+  // $params contains all symbol values
   echo "<h1>Hello there, {$params['name']}!</h1>";
 });
 
