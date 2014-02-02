@@ -11,6 +11,7 @@ middleware(function () {
 
 // gets run on routes with {name} symbol
 bind('name', function ($name) {
+  // return value gets used as new symbol value
   return strtoupper($name);
 });
 
