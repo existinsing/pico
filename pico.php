@@ -8,6 +8,11 @@
 
 /**
  * Set an http error handler, or trigger one
+ *
+ * @param int $code error code to map to or to trigger
+ * @param callable $callback error handler for the code
+ *
+ * @return void
  */
 function error($code, $callback = null) {
 
@@ -28,7 +33,12 @@ function error($code, $callback = null) {
 }
 
 /**
- * URL redirect
+ * Perform URL redirect
+ *
+ * @param string $location url to redirect to
+ * @param int $code http status code (defaults to 302)
+ *
+ * @return void
  */
 function redirect($location, $code = 302) {
   header("Location: {$location}", true, intval($code));
@@ -36,7 +46,12 @@ function redirect($location, $code = 302) {
 }
 
 /**
- * Route symbol, regex, or generic filters
+ * Add a middleware routine that gets executed
+ * before each request.
+ *
+ * @param callable $callback routine to execute
+ *
+ * @return void
  */
 function middleware($callback = null) {
 
@@ -84,7 +99,13 @@ function bind($symbol, $callback = null) {
 }
 
 /**
- * Route mapping function
+ * Map a callback against a method-route pair.
+ *
+ * @param string|array $methods http methods to map to
+ * @param string $pattern route pattern to map to
+ * @param callable $callback route handler
+ *
+ * @return void
  */
 function route($methods, $pattern, $callback) {
 
@@ -104,6 +125,8 @@ function route($methods, $pattern, $callback) {
 
 /**
  * Request dispatcher
+ *
+ * @return void
  */
 function pico() {
 
