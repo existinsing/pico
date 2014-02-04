@@ -127,6 +127,8 @@ function pico() {
     }
   }
 
+  middleware($uri, $params);
+
   if ($callback == null)
     error(404);
 
@@ -136,7 +138,6 @@ function pico() {
     array_flip($tokens)
   ));
 
-  middleware($uri, $params);
   call_user_func($callback, bind($params));
 }
 ?>
