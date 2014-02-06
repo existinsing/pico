@@ -14,7 +14,7 @@
  *
  * @return void
  */
-function error($code, $callback = null) {
+function pico_error($code, $callback = null) {
 
   static $handlers = array();
 
@@ -40,7 +40,7 @@ function error($code, $callback = null) {
  *
  * @return void
  */
-function redirect($location, $code = 302) {
+function pico_redirect($location, $code = 302) {
   header("Location: {$location}", true, intval($code));
   exit;
 }
@@ -53,7 +53,7 @@ function redirect($location, $code = 302) {
  *
  * @return void
  */
-function middleware($callback = null) {
+function pico_middleware($callback = null) {
 
   static $stack = array();
 
@@ -71,7 +71,7 @@ function middleware($callback = null) {
 /**
  * Bind transform callbacks to route symbol values
  */
-function bind($symbol, $callback = null) {
+function pico_bind($symbol, $callback = null) {
 
   // callback store and symbol cache
   static $bindings = array();
@@ -107,7 +107,7 @@ function bind($symbol, $callback = null) {
  *
  * @return void
  */
-function route($methods, $pattern, $callback) {
+function pico_route($methods, $pattern, $callback) {
 
   static $routes = array();
 
@@ -128,7 +128,7 @@ function route($methods, $pattern, $callback) {
  *
  * @return void
  */
-function pico() {
+function pico_run() {
 
   $uri = '/'.trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
@@ -140,7 +140,7 @@ function pico() {
       $method = isset($_POST['_method']) ? $_POST['_method'] : $method;
   }
 
-  $routes = route(null, null, null);
+  $routes = pico_route(null, null, null);
   $callback = null;
 
   foreach ($routes[$method] as $regexpr => $handler) {
@@ -150,10 +150,10 @@ function pico() {
     }
   }
 
-  middleware($uri, $params);
+  pico_middleware($uri, $params);
 
   if ($callback == null)
-    error(404);
+    pico_error(404);
 
   $tokens = array_filter(array_keys($params), 'is_string');
   $params = array_map('urldecode', array_intersect_key(
@@ -161,6 +161,6 @@ function pico() {
     array_flip($tokens)
   ));
 
-  call_user_func($callback, bind($params));
+  call_user_func($callback, pico_bind($params));
 }
 ?>

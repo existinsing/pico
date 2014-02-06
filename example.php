@@ -22,33 +22,33 @@ $DB = [
 ];
 
 // 404 handler
-error(404, function () {
+pico_error(404, function () {
   http_response_code(404);
   echo json_encode(["code" => 404, "data" => null]);
 });
 
 // middleware, just say everything's application/json
-middleware(function () {
+pico_middleware(function () {
   header('content-type: application/json');
 });
 
 // converts fruit id (from {fruit}) to fruit instance
-bind('fruit_id', function ($fruit_id) use ($DB) {
+pico_bind('fruit_id', function ($fruit_id) use ($DB) {
   return isset($DB[$fruit_id]) ? $DB[$fruit_id] : null;
 });
 
 // list all fruits
-route('GET', '/fruits', function () use ($DB) {
+pico_route('GET', '/fruits', function () use ($DB) {
   echo json_encode(["code" => 200, "data" => $DB]);
 });
 
 // dump fruit info
-route('GET', '/fruits/{fruit_id}', function ($params) {
+pico_route('GET', '/fruits/{fruit_id}', function ($params) {
   if ($params['fruit_id'])
     echo json_encode(["code" => 200, "data" => $params['fruit_id']]);
   else
-    error(404);
+    pico_error(404);
 });
 
 // serve
-pico();
+pico_run();
