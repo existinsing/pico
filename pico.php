@@ -21,11 +21,11 @@ function pico_error($code, $callback = null) {
   $code = intval($code);
 
   if ($callback == null) {
-    http_response_code($code);
+    header("{$_SERVER['SERVER_PROTOCOL']} {$code} Error");
     if (isset($handlers[$code]))
       call_user_func($handlers[$code]);
     else
-      echo "{$code} - Application Error";
+      echo "{$code} - Error";
     exit;
   }
 
