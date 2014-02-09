@@ -20,16 +20,15 @@ function pico_error($code, $callback = null) {
 
   $code = intval($code);
 
-  if ($callback == null) {
-    header("{$_SERVER['SERVER_PROTOCOL']} {$code} Error");
-    if (isset($handlers[$code]))
-      call_user_func($handlers[$code]);
-    else
-      echo "{$code} - Error";
-    exit;
-  }
+  if ($callback !== null)
+    return ($handlers[$code] = $callback);
 
-  $handlers[$code] = $callback;
+  header("{$_SERVER['SERVER_PROTOCOL']} {$code} Error");
+
+  if (isset($handlers[$code]))
+    exit(call_user_func($handlers[$code]));
+
+  exit("{$code} - Error");
 }
 
 /**
@@ -134,10 +133,9 @@ function pico_run() {
 
   $method = strtoupper($_SERVER['REQUEST_METHOD']);
   if ($method == 'POST') {
+    $method = isset($_POST['_method']) ? $_POST['_method'] : $method;
     if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']))
       $method = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'];
-    else
-      $method = isset($_POST['_method']) ? $_POST['_method'] : $method;
   }
 
   $routes = pico_route(null, null, null);
