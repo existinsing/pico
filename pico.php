@@ -142,11 +142,12 @@ function run() {
     $method = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'];
 
   $routes = route(null, null, null);
-  $routes = isset($routes[$method]) ? $routes[$method] : array();
+
+  if (!isset($routes[$method]))
+    error(404);
 
   $callback = null;
-
-  foreach ($routes as $regexpr => $handler) {
+  foreach ($routes[$method] as $regexpr => $handler) {
     if (!preg_match($regexpr, $uri, $params))
       continue;
     $callback = $handler;
