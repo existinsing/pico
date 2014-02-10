@@ -6,6 +6,8 @@
  * @license MIT <http://noodlehaus.mit-license.org>
  */
 
+namespace noodlehaus\pico;
+
 /**
  * Set an http error handler, or trigger one
  *
@@ -14,7 +16,7 @@
  *
  * @return void
  */
-function pico_error($code, $callback = null) {
+function error($code, $callback = null) {
 
   static $handlers = array();
 
@@ -39,7 +41,7 @@ function pico_error($code, $callback = null) {
  *
  * @return void
  */
-function pico_redirect($location, $code = 302) {
+function redirect($location, $code = 302) {
   header("Location: {$location}", true, intval($code));
   exit;
 }
@@ -52,7 +54,7 @@ function pico_redirect($location, $code = 302) {
  *
  * @return void
  */
-function pico_middleware($callback = null) {
+function middleware($callback = null) {
 
   static $stack = array();
 
@@ -70,7 +72,7 @@ function pico_middleware($callback = null) {
 /**
  * Bind transform callbacks to route symbol values
  */
-function pico_bind($symbol, $callback = null) {
+function bind($symbol, $callback = null) {
 
   // callback store and symbol cache
   static $bindings = array();
@@ -106,7 +108,7 @@ function pico_bind($symbol, $callback = null) {
  *
  * @return void
  */
-function pico_route($methods, $pattern, $callback) {
+function route($methods, $pattern, $callback) {
 
   static $routes = array();
 
@@ -127,31 +129,34 @@ function pico_route($methods, $pattern, $callback) {
  *
  * @return void
  */
-function pico_run() {
+function run() {
 
   $uri = '/'.trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
   $method = strtoupper($_SERVER['REQUEST_METHOD']);
-  if ($method == 'POST') {
-    $method = isset($_POST['_method']) ? $_POST['_method'] : $method;
-    if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']))
-      $method = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'];
-  }
 
-  $routes = pico_route(null, null, null);
+  if ($method == 'POST')
+    $method = isset($_POST['_method']) ? $_POST['_method'] : $method;
+
+  if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']))
+    $method = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'];
+
+  $routes = route(null, null, null);
   $callback = null;
 
   foreach ($routes[$method] as $regexpr => $handler) {
-    if (preg_match($regexpr, $uri, $params)) {
-      $callback = $handler;
-      break;
-    }
+
+    if (!preg_match($regexpr, $uri, $params))
+      continue;
+
+    $callback = $handler;
+    break;
   }
 
-  pico_middleware($uri, $params);
+  middleware($uri, $params);
 
   if ($callback == null)
-    pico_error(404);
+    error(404);
 
   $tokens = array_filter(array_keys($params), 'is_string');
   $params = array_map('urldecode', array_intersect_key(
@@ -159,6 +164,6 @@ function pico_run() {
     array_flip($tokens)
   ));
 
-  call_user_func($callback, pico_bind($params));
+  call_user_func($callback, bind($params));
 }
 ?>
