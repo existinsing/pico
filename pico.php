@@ -167,4 +167,3 @@ function run() {
 
   call_user_func($callback, bind($params));
 }
-?>
