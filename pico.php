@@ -6,8 +6,6 @@
  * @license MIT <http://noodlehaus.mit-license.org>
  */
 
-namespace noodlehaus\pico;
-
 /**
  * Set an http error handler, or trigger one
  *
@@ -44,59 +42,6 @@ function error($code, $callback = null) {
 function redirect($location, $code = 302) {
   header("Location: {$location}", true, intval($code));
   exit;
-}
-
-/**
- * Add a middleware routine that gets executed
- * before each request.
- *
- * @param callable $callback routine to execute
- *
- * @return void
- */
-function middleware($callback = null) {
-
-  static $stack = array();
-
-  // mapping call
-  if (is_callable($callback)) {
-    $stack[] = $callback;
-    return;
-  }
-
-  // run generic hooks
-  foreach ($stack as $cb)
-    call_user_func($cb);
-}
-
-/**
- * Bind transform callbacks to route symbol values
- */
-function bind($symbol, $callback = null) {
-
-  // callback store and symbol cache
-  static $bindings = array();
-  static $symcache = array();
-
-  // bind callback to symbol
-  if (is_callable($callback)) {
-    $bindings[$symbol] = $callback;
-    return;
-  }
-
-  // string symbol, look it up
-  if (!is_array($symbol))
-    return isset($symcache[$symbol]) ? $symcache[$symbol] : null;
-
-  // called with hash, exec (internal API)
-  $values = array();
-  foreach ($symbol as $sym => $val) {
-    if (isset($bindings[$sym]))
-      $symcache[$sym] = $val = call_user_func($bindings[$sym], $val);
-    $values[$sym] = $val;
-  }
-
-  return $values;
 }
 
 /**
@@ -154,8 +99,6 @@ function run() {
     break;
   }
 
-  middleware($uri, $params);
-
   if ($callback == null)
     error(404);
 
@@ -165,5 +108,5 @@ function run() {
     array_flip($tokens)
   ));
 
-  call_user_func($callback, bind($params));
+  call_user_func_array($callback, array_values($params));
 }
