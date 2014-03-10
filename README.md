@@ -39,6 +39,9 @@ route('GET', '/index', 'index_function');
 route('GET', '/users/:username', function ($username) {
   // $username is taken from :username
 });
+
+// create route defaults
+route('GET', '/items(/:page)?', function ($page = 1) {});
 ```
 
 #### redirect($location, $code = 302);
