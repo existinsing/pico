@@ -28,13 +28,13 @@ middleware(function () {
 
 // create a custom 404 handler
 error(404, function () {
-  echo json_encode(array("code" => 404, "data" => null));
+  json(array("code" => 404, "data" => null));
 });
 
 // list all fruits
 route('GET', '/fruits', function () {
   $fruits = ioc('fruits');
-  echo json_encode(array("code" => 200, "data" => $fruits));
+  json(array("code" => 200, "data" => $fruits));
 });
 
 // dump fruit info
@@ -42,8 +42,14 @@ route('GET', '/fruits/{fruit_id}', function ($fruit_id) {
   $fruits = ioc('fruits');
   if (!isset($fruits[$fruit_id]))
     error(404);
-  echo json_encode(array("code" => 200, "data" => $fruits[$fruit_id]));
+  json(array("code" => 200, "data" => $fruits[$fruit_id]));
 });
+
+// our helper
+function json($data) {
+  header("content-type: application/json");
+  echo json_encode($data);
+}
 
 // serve
 run();
