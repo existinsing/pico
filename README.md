@@ -4,9 +4,11 @@ form personal use.
 ```php
 <?php
 function run();
-function route($methods = null, $pattern = null, $callback = null);
+function route($methods, $pattern, $callback);
 function redirect($location, $code = 302);
 function error($code, $callback = null);
+function middleware($callback);
+function ioc($name, $loader = null, $shared = false);
 ?>
 ```
 
@@ -36,6 +38,14 @@ $DB = array(
   )
 );
 
+// middleware, routine that runs for every request
+middleware(function () {
+  ioc('db', function () {
+    // put a db loader into our ioc, for lazy loading
+    return new mongoclient('mongodb://localhost');
+  }, $shared = true);
+});
+
 // 404 handler
 error(404, function () {
   header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
@@ -44,6 +54,8 @@ error(404, function () {
 
 // list all fruits
 route('GET', '/fruits', function () use ($DB) {
+  // how you would get something from the ioc()
+  $db = ioc('db');
   echo json_encode(array("code" => 200, "data" => $DB));
 });
 

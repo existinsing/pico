@@ -21,6 +21,19 @@ $DB = array(
   )
 );
 
+// middleware, routine that runs for every request
+middleware(function () {
+
+  // there's only one basket
+  ioc('basket', function () {
+  }, $shared = true);
+
+  // a fruit salad creator
+  ioc('salad', function () {
+    return new stdclass;
+  }, $shared = false);
+});
+
 // 404 handler
 error(404, function () {
   header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
@@ -29,11 +42,15 @@ error(404, function () {
 
 // list all fruits
 route('GET', '/fruits', function () use ($DB) {
+  // get our basket instance
+  $basket = ioc('basket');
   echo json_encode(array("code" => 200, "data" => $DB));
 });
 
 // dump fruit info
 route('GET', '/fruits/{fruit_id}', function ($fruit_id) use ($DB) {
+  // create a new salad
+  $salad = ioc('salad');
   if (!isset($DB[$fruit_id]))
     error(404);
   echo json_encode(array("code" => 200, "data" => $DB[$fruit_id]));
