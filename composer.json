@@ -1,13 +1,19 @@
 {
   "name": "noodlehaus/pico",
-  "description": "fast and simple routing for your apps",
+  "description": "pico is a toolkit for creating small php apps",
   "license": "MIT",
-  "keywords": ["front-controller", "micro-framework", "micro", "microphp"],
+  "keywords": [
+    "front-controller",
+    "toolkit",
+    "micro-framework",
+    "micro",
+    "microphp"
+  ],
   "authors": [
     { "name": "Jesus A. Domingo", "email": "jesus.domingo@gmail.com" }
   ],
   "require": {
-    "php": ">= 5.3.0"
+    "php": ">= 5.4.0"
   },
   "autoload": {
     "files": [

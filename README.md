@@ -1,4 +1,4 @@
-`pico` is a toolkit for quickly prototyping small and simple php apps.
+`pico` is a toolkit for creating small php apps.
 
 ### function catalog
 
