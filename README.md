@@ -17,12 +17,16 @@ function ioc($name, $loader = null, $shared = false);
 
 ## api documentation
 
-### run();
+### run()
+
+`run()`
 
 Dispatches the current HTTP request and matches it against the our routes.
 If no route handler exists for the requested URI, a `404` is emitted.
 
-### route($methods, $pattern, $callback);
+### route()
+
+`route($methods, $pattern, $callback)`
 
 Maps a handler against the method(s) and route pattern pair. `$methods` can
 be an array of HTTP methods that you want the route to respond to.
@@ -46,7 +50,9 @@ route('GET', '/users/:username', function ($username) {
 route('GET', '/items(/:page)?', function ($page = 1) {});
 ```
 
-### redirect($location, $code = 302);
+### redirect()
+
+`redirect($location, $code = 302)`
 
 Flushes out an HTTP redirect header using the value from `$location` and the
 optional `$code`. The default status code for this is `302`.
@@ -60,7 +66,9 @@ redirect('/index');
 redirect('/index', 301);
 ```
 
-### error($code, $handler = null)
+### error()
+
+`error($code, $handler = null)`
 
 If called with a callable value for `$handler`, this function maps that
 callable against error code `$code`. If that HTTP error code is raised,
@@ -81,7 +89,9 @@ error(404, function () {
 error(404);
 ```
 
-### middleware($callback);
+### middleware()
+
+`middleware($callback)`
 
 Sets up a routine that gets run everytime a request has a matching handler.
 This exists mainly to provide a contained scope for doing start up tasks.
@@ -96,7 +106,9 @@ middleware(function () {
 });
 ```
 
-### ioc($name, $loader = null, $shared = false);
+### ioc()
+
+`ioc($name, $loader = null, $shared = false)`
 
 This is a simplistic object container, factory, or whatever this should be
 called.
