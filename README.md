@@ -1,6 +1,8 @@
+## pico
+
 `pico` is a toolkit for creating small php apps.
 
-### function catalog
+### function list
 
 ```php
 <?php
@@ -13,7 +15,7 @@ function ioc($name, $loader = null, $shared = false);
 ?>
 ```
 
-### functions documentation
+### api documentation
 
 #### run();
 
