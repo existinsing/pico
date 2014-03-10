@@ -1,73 +1,127 @@
-`pico` is a bare bones router for your php app. written primarily
-form personal use.
+`pico` is a toolkit for quickly prototyping small and simple php apps.
+
+### function catalog
 
 ```php
 <?php
 function run();
 function route($methods, $pattern, $callback);
 function redirect($location, $code = 302);
-function error($code, $callback = null);
+function error($code, $handler = null);
 function middleware($callback);
 function ioc($name, $loader = null, $shared = false);
 ?>
 ```
 
-how to use it:
+### functions documentation
+
+#### run()
+
+Dispatches the current HTTP request and matches it against the our routes.
+If no route handler exists for the requested URI, a `404` is emitted.
+
+#### route($methods, $pattern, $callback)
+
+Maps a handler against the method(s) and route pattern pair. `$methods` can
+be an array of HTTP methods that you want the route to respond to.
+
+Route patterns can contain symbols of the form `:symbol`. Values matched by
+these symbols are then passed as arguments to your route handler.
+
+Your route handler has to be a `callable`.
 
 ```php
 <?php
-require __DIR__."/pico.php";
+// simple route
+route('GET', '/index', 'index_function');
 
-// our mock database
-$DB = array(
-  'fruit-1' => array(
-    'color' => 'green',
-    'name' => 'apple'
-  ),
-  'fruit-2' => array(
-    'color' => 'yellow',
-    'name' => 'banana'
-  ),
-  'fruit-3' => array(
-    'color' => 'red',
-    'name' => 'strawberry'
-  ),
-  'fruit-4' => array(
-    'color' => 'orange',
-    'name' => 'orange'
-  )
-);
+// route with symbols
+route('GET', '/users/:username', function ($username) {
+  // $username is taken from :username
+});
+```
 
-// middleware, routine that runs for every request
+#### redirect($location, $code = 302)
+
+Flushes out an HTTP redirect header using the value from `$location` and the
+optional `$code`. The default status code for this is `302`.
+
+```php
+<?php
+// redirect with default code
+redirect('/index');
+
+// override the default code
+redirect('/index', 301);
+```
+
+#### error($code, $handler = null)
+
+If called with a callable value for `$handler`, this function maps that
+callable against error code `$code`. If that HTTP error code is raised,
+then that handler will be called. Only one handler can be mapped against
+a `$code`.
+
+If called with just the `$code` argument, this raises the HTTP error and
+invokes the handler for it.
+
+```php
+<?php
+// create a 404 handler
+error(404, function () {
+  die("Sorry, we can't find your page.");
+});
+
+// trigger a 404, which will call our handler
+error(404);
+```
+
+#### middleware($callback);
+
+Sets up a routine that gets run everytime a request has a matching handler.
+This exists mainly to provide a contained scope for doing start up tasks.
+
+```php
+<?php
+// this gets executed if there's a matching handler for the request
 middleware(function () {
   ioc('db', function () {
-    // put a db loader into our ioc, for lazy loading
     return new mongoclient('mongodb://localhost');
-  }, $shared = true);
+  }, true);
+});
+```
+
+#### ioc($name, $loader = null, $shared = false)
+
+This is a simplistic object container, factory, or whatever this should be
+called.
+
+`$name` is the name of the object instance.
+
+`$loader` is the routine that generates the instance.
+
+`$shared` tells whether `$loader` is invoked everytime `$name` is requested
+from the container, or only only invoked once and the result is cached.
+default value for this is `true`.
+
+Calling this with just the `$name` argument performs a fetch of the instance.
+
+```php
+<?php
+// shared
+ioc('always_one', function () {
+  static $one = 1;
+  return $one++;
+}, true);
+
+// not shared
+ioc('next', function () {
+  static $id = 1;
+  return $id++;
 });
 
-// 404 handler
-error(404, function () {
-  header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
-  echo json_encode(array("code" => 404, "data" => null));
-});
-
-// list all fruits
-route('GET', '/fruits', function () use ($DB) {
-  // how you would get something from the ioc()
-  $db = ioc('db');
-  echo json_encode(array("code" => 200, "data" => $DB));
-});
-
-// dump fruit info
-route('GET', '/fruits/{fruit_id}', function ($fruit_id) use ($DB) {
-  if (!isset($DB[$fruit_id]))
-    error(404);
-  echo json_encode(array("code" => 200, "data" => $DB[$fruit_id]));
-});
-
-// serve
-run();
+assert(ioc('always_one') == ioc('always_one'));
+assert(ioc('next') == ioc('next') + 1);
 ```
 
 Released under the MIT license - <http://noodlehaus.mit-license.org>

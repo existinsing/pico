@@ -1,6 +1,6 @@
 <?php
 /**
- * pico provides fast and simple routing for your apps.
+ * pico is a toolkit for quickly prototyping small and simple php apps.
  *
  * @author Jesus A. Domingo <jesus.domingo@gmail.com>
  * @license MIT <http://noodlehaus.mit-license.org>
@@ -8,11 +8,6 @@
 
 /**
  * Set an http error handler, or trigger one
- *
- * @param int $code error code to map to or to trigger
- * @param callable $callback error handler for the code
- *
- * @return void
  */
 function error($code, $callback = null) {
 
@@ -32,12 +27,7 @@ function error($code, $callback = null) {
 }
 
 /**
- * Perform URL redirect
- *
- * @param string $location url to redirect to
- * @param int $code http status code (defaults to 302)
- *
- * @return void
+ * Perform a URL redirect
  */
 function redirect($location, $code = 302) {
   header("Location: {$location}", true, intval($code));
@@ -48,10 +38,6 @@ function redirect($location, $code = 302) {
  * Add a middleware routine that gets executed before each request.
  * This is more for encapsulating logic that would otherwise just be
  * floating around in the global scope.
- *
- * @param callable $callback routine to execute
- *
- * @return void
  */
 function middleware($callback = null) {
 
@@ -70,12 +56,6 @@ function middleware($callback = null) {
 
 /**
  * Map a callback against a method-route pair.
- *
- * @param string|array $methods http methods to map to
- * @param string $pattern route pattern to map to
- * @param callable $callback route handler
- *
- * @return void
  */
 function route($methods = null, $pattern = null, $callback = null) {
 
@@ -97,8 +77,6 @@ function route($methods = null, $pattern = null, $callback = null) {
 
 /**
  * Request dispatcher
- *
- * @return void
  */
 function run() {
 
@@ -115,9 +93,9 @@ function run() {
 
   $routes = route();
 
-  // we give a bad request error for unsupported method
+  // no defined handlers for method
   if (!isset($routes[$method]))
-    error(400);
+    error(404);
 
   $callback = null;
   foreach ($routes[$method] as $regexpr => $handler) {
@@ -147,12 +125,6 @@ function run() {
  * Simplistic ioc container. If called with just the service name,
  * the instance (if available or can be loaded) is returned. Passing
  * a loader routine registers that routine to the service.
- *
- * @param string $name name for the service to register
- * @param callable $loader optional, lazy loader for the service
- * @param boolean $shared defaults to false, if instance is shared
- *
- * @return mixed whatever the loader generates
  */
 function ioc($name, $loader = null, $shared = false) {
 
