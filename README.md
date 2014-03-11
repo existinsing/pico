@@ -118,8 +118,8 @@ called.
 `$loader` is the routine that generates the instance.
 
 `$shared` tells whether `$loader` is invoked everytime `$name` is requested
-from the container, or only only invoked once and the result is cached.
-default value for this is `true`.
+from the container, or only invoked once and the result is cached.
+The default value for this is `true`.
 
 Calling this with just the `$name` argument performs a fetch of the instance.
 
