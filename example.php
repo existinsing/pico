@@ -1,9 +1,10 @@
 <?php
 require __DIR__."/pico.php";
 
-// this routine gets run for every request that has a handler
+// middleware functions get run on matching requests
 middleware(function () {
-  // register a shared object/service
+
+  // register a shared service (lazy-loaded)
   ioc('fruits', function () {
     return array(
       'fruit-1' => array(
@@ -24,6 +25,7 @@ middleware(function () {
       )
     );
   }, $shared = true);
+
 });
 
 // create a custom 404 handler
