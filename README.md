@@ -119,7 +119,7 @@ called.
 
 `$shared` tells whether `$loader` is invoked everytime `$name` is requested
 from the container, or only invoked once and the result is cached.
-The default value for this is `true`.
+The default value for this is `false`.
 
 Calling this with just the `$name` argument performs a fetch of the instance.
 
