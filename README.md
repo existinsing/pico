@@ -143,6 +143,17 @@ assert(ioc('always_one') == ioc('always_one'));
 assert(ioc('next') == ioc('next') + 1);
 ```
 
+## related libraries
+
+[noodlehaus/phtml](http://noodlehaus.github.io/phtml) is for rendering `phtml`
+template files.
+
+[noodlehaus/context](http://noodlehaus.github.io/context) provides wrappers
+for some of PHP's super globals, and request and response headers.
+
+[noodlehaus/mongo](http://noodlehaus.github.io/mongo) is a procedural wrapper
+for CRUD operations in mongodb.
+
 ## license
 
 Released under the MIT license - <http://noodlehaus.mit-license.org>
