@@ -57,6 +57,8 @@ route('GET', '/items(/:page)?', function ($page = 1) {});
 Flushes out an HTTP redirect header using the value from `$location` and the
 optional `$code`. The default status code for this is `302`.
 
+**This terminates script execution after the redirect header has been sent.**
+
 ```php
 <?php
 // redirect with default code
@@ -76,7 +78,7 @@ then that handler will be called. Only one handler can be mapped against
 a `$code`.
 
 If called with just the `$code` argument, this raises the HTTP error and
-invokes the handler for it.
+invokes the handler for it. **This terminates script execution.**
 
 ```php
 <?php
