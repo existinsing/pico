@@ -1,4 +1,4 @@
-<?php
+    <?php
 /**
  * pico is a toolkit for quickly prototyping small and simple php apps.
  *
@@ -11,7 +11,7 @@
  */
 function error($code, $callback = null) {
 
-  static $handlers = [];
+  static $handlers = array();
 
   $code = intval($code);
 
@@ -41,7 +41,7 @@ function redirect($location, $code = 302) {
  */
 function middleware($callback = null) {
 
-  static $stack = [];
+  static $stack = array();
 
   // mapping call
   if (is_callable($callback)) {
@@ -59,7 +59,7 @@ function middleware($callback = null) {
  */
 function route($methods = null, $pattern = null, $callback = null) {
 
-  static $routes = [];
+  static $routes = array();
 
   // internal api, for getting all defined routes
   if (func_num_args() == 0)
@@ -128,17 +128,15 @@ function run() {
  */
 function ioc($name, $loader = null, $shared = false) {
 
-  static $loaders = [];
-  static $objects = [];
+  static $loaders = array();
+  static $objects = array();
 
   // fetch logic
   if (func_num_args() == 1) {
 
     // locate the loader
     list($loader, $shared) = (
-      isset($loaders[$name]) ?
-      $loaders[$name] :
-      [null, null]
+      isset($loaders[$name]) ? $loaders[$name] : array(null, null)
     );
 
     // if no loader, then give back null but issue a warning
@@ -162,5 +160,5 @@ function ioc($name, $loader = null, $shared = false) {
   }
 
   // set logic
-  $loaders[$name] = [$loader, $shared];
+  $loaders[$name] = array($loader, $shared);
 }
